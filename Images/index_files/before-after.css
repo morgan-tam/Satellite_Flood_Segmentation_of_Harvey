@@ -1,0 +1,43 @@
+/* ================
+// Before and After
+// ============= */
+.before-and-after {
+    position: relative;
+    overflow: hidden;
+    cursor: ew-resize;
+}
+
+.before-and-after img {
+    display: block;
+    width: 100%;
+}
+
+.image-before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -2;
+    width: 100%;
+}
+
+.image-revealer {
+    overflow: hidden;
+    -webkit-transform: translate(50%, 0);
+    transform: translate(50%, 0);
+}
+
+.image-revealer:before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 20;
+    height: 100%;
+    width: .2em;
+    content: '';
+    background: #fff;
+}
+
+.image-after {
+    -webkit-transform: translate(-50%, 0);
+    transform: translate(-50%, 0);
+}
