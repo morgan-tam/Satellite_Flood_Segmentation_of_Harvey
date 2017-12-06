@@ -1,6 +1,6 @@
 # Semi-Supervised Flood Segmentation of Satellite Images of Houston After Harvey. 
 
-**Problem:** 
+**PROBLEM:** 
 During this past summer, there’s been an abnormal amount of natural disasters in North and South America. The frequency of hydrological catastrophes has been on the rise since the 80s. For a final project at Metis, I want to create a method to detect flood automatically on streaming satellite data, so authorities and first responders can prioritize relief efforts.
 
 ![Natural Disaster Trends from Economist](Images/Economist_Trend.png?raw=true "Title")
@@ -10,13 +10,13 @@ Fig. 1 Natural Disaster Trends from The Economist.
 Fig. 2 A picture taken by my friend in St. Marteen right after Irma.
 
 
-**Data:** 
+**DATA:** 
 DigitalGlobe recently started their Open Data Program, generously sharing their satellite data of locations before and after a natural disaster. My particular data is a three band (R,G,B) high resolution aerial image before and after Harvey in Houston. The ground truth is from the MDA shapefile that used Radarsat to detect flood (https://www.digitalglobe.com/opendata).
 ![Houston](Images/Entire_Data.png?raw=true "Title")
 Fig. 3 Satellite Data of Houston Post-Harvey.
 
 
-**Challenges:** 
+**CHALLENGES:** 
 1. I had a time constraint of two weeks to present instead of four due to the fact that the data came out in the middle of the project timeline. 
 
 2. The data was a decent size of 180 GB due to the very high resolution of satellite images of the whole city of Houston.
@@ -34,7 +34,7 @@ Fig. 4 Incomplete Radarsat Ground Truth.
 Fig. 5 Flood segmentation in residential areas. 
  
 
-**My Approach:**
+**APPROACH:**
 
 **1. [Create Initial Input Data:](1.Create_Initial_Input_Data.ipynb)**
 I used multiprocessing to split up large images (1GB each) into many manageable tiles and generate ground truth masks from the given Radarsat shapefiles for corresponding image tiles.
@@ -64,6 +64,9 @@ Fig. 9 Resnet result of Original Data
 
 **4a. [K-means Exploration](4a.K-means_Exploration.ipynb)**
 Because the models' performance is bottlenecked by the incomplete Radarsat ground truth, I decided to go with an unsupervised approach. Here, I explored using K-means clustering, which is a popular clustering algorithm for general data. Once the users choose how many clusters they want, K-means will find the best centroid for each cluster, including images. However, choosing the right K is a challenge in itself, espeically for varying images.
+
+![K-means gif](Images/giphy-3.gif?raw=true "Title")
+![K-means gif](Images/giphy-2.gif?raw=true "Title")
 
 I Initialized with an average pixel center instead of finding random centroids or even using K++. For each observation, I iterate between 4-8 clusters choosing one that overlaps the most with the original ground truth. I Experimented with different intersections and union with U-Net predictions and radarsat ground truth. The masks look more promising but has high chance of false positive (which might be okay for prototype).
 
@@ -126,7 +129,8 @@ Fig. 17 Model Prediction vs. Old Ground Truth
 It performed fairly well against the old ground truth, but this process still need improvements. It doesn’t do well with clouds and sometimes houses.
 
 
-**Next steps:**
+
+**NEXT STEPS:**
 For next time, I want to try
 
 -Spectral clustering
