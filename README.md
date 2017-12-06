@@ -113,18 +113,22 @@ Out of 1240 images that I went through, 15% of masks were good, 30% were bad, 55
 **[7. Train U-Net on Final Data](7.Train_U-Net_on_Final_Data.ipynb)**
 Now I'm going to feed back the model handpicked images, most were predictions from the previous model.
 The results I got was **80% in Jaccard similarity*, but there were only 50 validation set so that might be why the metric was so much higher. Visually, it does loom better than the final mask. It can even perform well when image is under shadow of a cloud.
+![Learning Rate](Images/Final_Model_LR.png?raw=true "Title")
+Fig. 15 Learning Rate
+
 ![Final Test Result](Images/Final_Validation_2.png?raw=true "Title")
-Fig. 15 Final Test Result
+Fig. 16 Final Test Result
 
 Let's take a look at a few examples how this model performs against the original ground truth mask and DBSCAN mask.
 ![Model Prediction vs. Old Masks](Images/Comparison_with_old_4.png?raw=true "Title")
-Fig. 16 Model Prediction vs. Old Ground Truth
+Fig. 17 Model Prediction vs. Old Ground Truth
 	
 It performed fairly well against the old ground truth, but this process still need improvements. It doesn’t do well with clouds and sometimes houses.
 
 
 **Next steps:**
 For next time, I want to try
+
 -Spectral clustering
 
 -Stitching images together
