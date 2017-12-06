@@ -35,11 +35,12 @@ Fig. 5 Flood segmentation in residential areas.
  
 
 **My Approach:**
+
 **1. [Create Initial Input Data:](1.Create_Initial_Input_Data.ipynb)**
 I used multiprocessing to split up large images (1GB each) into many manageable tiles and generate ground truth masks from the given Radarsat shapefiles for corresponding image tiles.
 
 
-**2. [Train U-Net Model on Radarsat Data](2.Train_U-Net_Model_on_Radarsat Data.ipynb)**
+**2. [Train U-Net Model on Radarsat Data](2.Train_U-Net_Model_on_Radarsat_Data.ipynb)**
 For my baseline model, I chose a U-Net for segmentation. U-Net is like CNN that encode & decodes but can skip connections that are on the same “level". It is good for prototyping, as it does not require 
 learning to perform well (https://arxiv.org/abs/1505.04597).
 Because of the large dataset, I had to use a generator to load the large data in mini-batches.
@@ -67,7 +68,7 @@ Because the models' performance is bottlenecked by the incomplete Radarsat groun
 I Initialized with an average pixel center instead of finding random centroids or even using K++. For each observation, I iterate between 4-8 clusters choosing one that overlaps the most with the original ground truth. I Experimented with different intersections and union with U-Net predictions and radarsat ground truth. The masks look more promising but has high chance of false positive (which might be okay for prototype).
 
 
-**4b. [Create K-means Clustered Input Data](4b.Create K-means Clustered Input Data.ipynb)**
+**4b. [Create K-means Clustered Input Data](4b.Create_K-means_Clustered_Input_Data.ipynb)**
 Here I recreate new masks using K-means, but because I needed all the cores for the clustering model, I didn't use multiprocessing for creating the data.
 
 I end up choosing intersecting with the prediction and union with Radarsat ground truth. 	This looks alright, but it still needs some Gaussian smoothing.
@@ -96,7 +97,7 @@ The implementation is same as step 4b.
 Fig. 13 DBSCAN Ground Truth Mask
 
 
-**5c. [Train U-Net Model on DBSCAN Clustered Data] (5c.Train_U-Net_Model_on_DBSCAN_Clustered_Data.ipynb) **
+**5c. [Train U-Net Model on DBSCAN Clustered Data](5c.Train_U-Net_Model_on_DBSCAN_Clustered_Data.ipynb) **
 The Jaccard Similarity is very low, **53%**, however the results don't look too bad.
 
 ![DBSCAN U-Net Result](Images/DBSCAN_UNET.png?raw=true "Title")
