@@ -35,11 +35,11 @@ Fig. 5 Flood segmentation in residential areas.
  
 
 **My Approach:**
-1. Create Initial Input Data
+**1. [Create Initial Input Data:](1.Create_Initial_Input_Data.ipynb)**
 I used multiprocessing to split up large images (1GB each) into many manageable tiles and generate ground truth masks from the given Radarsat shapefiles for corresponding image tiles.
 
 
-2. Train U-Net Model on Radarsat Data
+**2. [Train U-Net Model on Radarsat Data](2.Train_U-Net_Model_on_Radarsat Data.ipynb)**
 For my baseline model, I chose a U-Net for segmentation. U-Net is like CNN that encode & decodes but can skip connections that are on the same “level". It is good for prototyping, as it does not require 
 learning to perform well (https://arxiv.org/abs/1505.04597).
 Because of the large dataset, I had to use a generator to load the large data in mini-batches.
@@ -51,7 +51,7 @@ My result for the original data set is **49% in Jaccard Similarity**. Interestin
 Fig. 7 U-net result of Original Data
  
 
-3. Train ResNet
+**3. [Train ResNet](3.Train_ResNet.ipynb)**
 For my next model, I chose Residual Net. ResNet is a state-of-the-art CNN that is excellent at object detection and image segmentation (https://arxiv.org/abs/1512.03385). I used pre-trained weights from the ImageNet competition.
 ![Resnet](Images/Resnet.png?raw=true "Title")
 Fig. 8 Resnet Identity block.
@@ -61,13 +61,13 @@ My result for this model is **77% in Jaccard Similarity** which is a huge improv
 Fig. 9 Resnet result of Original Data
  
 
-4a. K-means Exploration
+**4a. [K-means Exploration](4a.K-means_Exploration.ipynb)**
 Because the models' performance is bottlenecked by the incomplete Radarsat ground truth, I decided to go with an unsupervised approach. Here, I explored using K-means clustering, which is a popular clustering algorithm for general data. Once the users choose how many clusters they want, K-means will find the best centroid for each cluster, including images. However, choosing the right K is a challenge in itself, espeically for varying images.
 
 I Initialized with an average pixel center instead of finding random centroids or even using K++. For each observation, I iterate between 4-8 clusters choosing one that overlaps the most with the original ground truth. I Experimented with different intersections and union with U-Net predictions and radarsat ground truth. The masks look more promising but has high chance of false positive (which might be okay for prototype).
 
 
-4b. Create K-means Clustered Input Data
+**4b. [Create K-means Clustered Input Data](4b.Create K-means Clustered Input Data.ipynb)**
 Here I recreate new masks using K-means, but because I needed all the cores for the clustering model, I didn't use multiprocessing for creating the data.
 
 I end up choosing intersecting with the prediction and union with Radarsat ground truth. 	This looks alright, but it still needs some Gaussian smoothing.
@@ -75,13 +75,13 @@ I end up choosing intersecting with the prediction and union with Radarsat groun
 Fig. 10 New K-means Ground Truth Mask
 
 
-4c. Train U-Net Model on K-means Clustered Data
+**4c. [Train U-Net Model on K-means Clustered Data](4c.Train_U-Net_Model_on_K-means_Clustered_Data.ipynb)**
 This time, U-Net results were much better, but it was still hard to use any metric to measure, had to manually visualize.
 ![K-means Result](Images/K-means_Result.png?raw=true "Title")
 Fig. 11 K-means Result
   
   
-5a. DBSCAN Exploration 
+**5a. [DBSCAN Exploration](5a.DBSCAN_Exploration.ipynb) **
 Next, I went with DBSCAN. DBSCAN is more appropriate for this type of data and unlike K-means, I do not have to specify how many clusters I need. It is not biased towards any cluster and becasue the images vary signficantly, this algorithm can perform better.	I do have to choose two parameters, radisu of clusters and minimum of points in each cluster. I chose a few values using the KNN distance plot and trial and error.
 ![KNN Distance Plot](Images/KNN_Distance.png?raw=true "Title")
 Fig. 12 KNN Distance Plot
@@ -89,27 +89,27 @@ Fig. 12 KNN Distance Plot
 I also created filter threshold to remove clusters that are too similar to vegetation (green), clouds (white), and buildings (grey).
 
 
-5b. Create DBSCAN Clustered Input Data 
+**5b. [Create DBSCAN Clustered Input Data](5b.Create_DBSCAN_Clustered_Input_Data.ipynb) **
 The implementation is same as step 4b.
 
 ![DBSCAN Ground Truth Mask](Images/DBSCAN_Exploration.png?raw=true "Title")
 Fig. 13 DBSCAN Ground Truth Mask
 
 
-5c. Train U-Net Model on DBSCAN Clustered Data 
+**5c. [Train U-Net Model on DBSCAN Clustered Data] (5c.Train_U-Net_Model_on_DBSCAN_Clustered_Data.ipynb) **
 The Jaccard Similarity is very low, **53%**, however the results don't look too bad.
 
 ![DBSCAN U-Net Result](Images/DBSCAN_UNET.png?raw=true "Title")
 Fig. 14 DDBSCAN U-Net Result
 	 
    
-6. Manually Selecting Training Data 
+**6. [Manually Selecting Training Data](6.Manually_Selecting_Traning_Data.ipynb)**
 Here comes the semi-supervised part. I needed to quickly select which images are good, so I uploaded the path to all my data to Redis server, so multiple users can pull information without any redundancy. I then prompt for choice, whether the mask is good, bad, or can be replaced by the U-Net prediction. Users can remotely go to copies of the jupyter notebook and organize data based on its quality. I remove the bad data and replace with better ones.
 
 Out of 1240 images that I went through, 15% of masks were good, 30% were bad, 55% could be replaced by U-Net predictions. This means there can be a lot more improvements for the DBSCAN process, but surprisingly, the U-Net predictions were able to pick off from the mask and do a better job. This hints that predictions can be used further in a sem-supervised approach.
 
 
-7. Train U-Net on Final Data
+**[7. Train U-Net on Final Data](7.Train_U-Net_on_Final_Data.ipynb)**
 Now I'm going to feed back the model handpicked images, most were predictions from the previous model.
 The results I got was **80% in Jaccard similarity*, but there were only 50 validation set so that might be why the metric was so much higher. Visually, it does loom better than the final mask. It can even perform well when image is under shadow of a cloud.
 ![Final Test Result](Images/Final_Validation_2.png?raw=true "Title")
